@@ -1,0 +1,42 @@
+     h DFTACTGRP(*NO) ACTGRP(*NEW) BNDDIR('DADA/BND1')
+     fEMPMST    if   e           k disk
+      *
+     d GetEnv          pr              *   extproc('getenv')
+     d var                             *   value options(*string)
+      *
+     dwritetoweb       pr                  extproc('QtmhWrStout')
+     d datavar                    65535a   options(*varsize)
+     d datalen                       10i 0 const
+     d errcode                     8000a   options(*varsize)
+      *
+     d CRLF            c                   x'0d25'
+     d data            s           5000a
+     d URL             s            500a   varying
+     d id              s                   like(EMPID)
+     d pos             s             10i 0
+      *
+     d errds           ds                  qualified
+     d byteprov                      10i 0 inz(0)
+     d byteavail                     10i 0 inz(0)
+      /free
+           data='Content-type:text/Json' + CRLF + CRLF ;
+             writetoweb(data:%len(%trim(data)):errds);
+           URL = %str(GetEnv('REQUEST_URI'));
+             pos=%scan('/webpgm1/':url) + %len('/webpgm1/') ;
+           monitor ;
+             id=%int(%subst(url:pos)) ;
+           on-error;
+             data = 'error';
+             writetoweb(data:%len(%trim(data)):errds);
+             return;
+           endmon;
+           chain id EMPMST;
+           if %found(EMPMST);
+            data = 'Name =' + %char(EMPNM);
+            writetoweb(data:%len(%trim(data)):errds);
+           else;
+            data='not found';
+            writetoweb(data:%len(%trim(data)):errds);
+           endif;
+      /end-free
+                  *Inlr = *on;
