@@ -1,0 +1,20 @@
+     D response        s           4096a    inz
+     D url             s            200a
+     D body            s           4096a
+      *
+             url = 'http://129.40.98.241:8012/ws/webpgm2';
+             Body = '"Name" = "Dada"';
+
+             Exec Sql
+             SET OPTION COMMIT = *NONE;
+
+             EXEC SQL call QSYS2.QCMDEXC('CHGJOB CCSID(37)');
+
+             EXEC SQL
+             SELECT DATA INTO :RESPONSE FROM(VALUES
+             CHAR(SYSTOOLS.HTTPPOSTCLOB(:URL,'',:body),4096)) WS(DATA);
+
+             EXEC SQL
+             INSERT INTO DADA/GETPF1 VALUES(:RESPONSE);
+
+             *Inlr  = *on;

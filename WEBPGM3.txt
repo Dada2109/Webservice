@@ -1,0 +1,17 @@
+     d response        s           4096a    inz
+     d url             s            200a
+
+           url = 'http://129.40.98.241:8012/ws/webpgm1/01';
+             Exec Sql
+             SET OPTION COMMIT = *NONE;
+
+             EXEC SQL call QSYS2.QCMDEXC('CHGJOB CCSID(37)');
+
+             EXEC SQL
+             SELECT DATA INTO :RESPONSE FROM(VALUES
+             CHAR(SYSTOOLS.HTTPGETCLOB(:URL,''),4096)) WS(DATA);
+
+             EXEC SQL
+             INSERT INTO DADA/GETPF1 VALUES(:RESPONSE);
+
+               *inlr = *on;
