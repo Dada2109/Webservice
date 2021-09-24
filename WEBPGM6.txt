@@ -1,0 +1,26 @@
+     d url             s            500a
+     d Response        s           9999a
+     d Msg             s          10000a
+     d Header          s            200a
+      *
+        url = 'https://gorest.co.in/public/v1/users/102';
+        Header = '<httpHeader>'+
+                 '<header name="Authorization" value="Bearer '+
+                '9a27b4df3c618006d21fad2120cb54f1d82ac73651f770eb8' +
+                 'f5cb14bb13d76af">'+
+                 '</header>'+
+                 '</httpHeader>';
+
+
+        Exec Sql
+               Set Option commit = *none;
+        Exec sql call QSYS2.QCMDEXC('CHGJOB CCSID(37)');
+
+          Exec Sql
+                 select coalesce(varChar(responseMsg,9999),' '),
+                 varChar(responseHttpHeader,10000) into :Response,:Msg
+                 from Table(Systools.HttpDeleteClobVerbose(:url,:Header));
+
+          Exec Sql
+                 Insert into dada/getpf1 values(:Response);
+            *inlr= *on;
